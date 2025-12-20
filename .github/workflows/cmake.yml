@@ -40,6 +40,16 @@ jobs:
         with:
           images: |
             bigibas123/${{ env.SUBDIR }}
+          labels: |
+            org.opencontainers.image.title="Debian CMake image"
+            org.opencontainers.image.description="A minimal debian Docker image with CMake and some other common tools installed"
+            org.opencontainers.image.base.name="debian:trixie-slim"
+            org.opencontainers.image.licenses="MIT-0"
+            org.opencontainers.image.vendor="${{ github.repository_owner }}"
+            org.opencontainers.image.authors="${{ github.repository_owner }}
+            org.opencontainers.image.url="https://github.com/bigibas123/random-docker-images/"
+            org.opencontainers.image.documentation="https://github.com/bigibas123/random-docker-images/"
+            org.opencontainers.image.source="${{ github.repositoryUrl }}"
           flavor: |
             latest=auto
           tags: |
