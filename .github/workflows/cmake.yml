@@ -47,7 +47,6 @@ jobs:
             type=schedule,pattern={{date 'YYYYMMDD' tz='Europe/Amsterdam'}}
             type=ref,event=branch
             type=ref,event=tag
-            type=sha
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=raw,value={{date 'YYYYMMDDHHmm' tz='Europe/Amsterdam'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
       - name: Build and push
