@@ -1,0 +1,63 @@
+name: CMake image build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/cmake.yml'
+      - 'cmake/**'
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/cmake.yml'
+      - 'cmake/**'
+  schedule:
+     - cron: "15 5 21 * *"
+
+env:
+  SUBDIR: cmake
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./${ env.SUBDIR }
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Login to Docker Hub
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            bigibas123/${{ env.SUBDIR }}
+          flavor: |
+            latest=auto
+          tags: |
+            type=schedule
+            type=schedule,pattern={{date 'YYYYMMDD' tz='Europe/Amsterdam'}}
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value={{date 'YYYYMMDDHHmm' tz='Europe/Amsterdam'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+      - name: Build and push
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: "{{defaultContext}}:${{ env.SUBDIR }}"
+          provenance: mode=max
+          sbom: true
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+        env:
+          SOURCE_DATE_EPOCH: ${{ env.TIMESTAMP }}
