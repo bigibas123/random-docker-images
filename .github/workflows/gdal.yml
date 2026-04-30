@@ -23,7 +23,7 @@ jobs:
   docker:
     strategy:
       matrix:
-        gdal_type: [ubuntu-small, ubuntu-full]
+        gdal_type: [ubuntu-small, ubuntu-full, alpine-small, alpine-normal]
         gdal_version: [latest, 3.12.1, 3.11.5, 3.10.3, 3.9.3, 3.8.5, 3.8.3 ]
     runs-on: ubuntu-latest
     defaults:
